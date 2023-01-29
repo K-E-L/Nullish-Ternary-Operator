@@ -1,61 +1,35 @@
-# template-for-proposals
+# Motivations
+There are no good ways of resolving a conditional to a nullish value as they resolve to a  truthy value by default. The nullish ternary will resolve the conditional to a nullish value without needing the extra syntax necessary to make this possible.
 
-A repository template for ECMAScript proposals.
+# Details
+A regular ternary looks like this and solves the condition based on truthiness
+``` markdown
+(condition) ? expression_if_truthy : expression_if_falsey
+```
 
-## Before creating a proposal
+The proposed nullish ternary will look like this and solves the condition based on nullishness
+``` markdown
+(condition) ?? expression_if_not_nullish : expression_if_nullish
+```
 
-Please ensure the following:
-  1. You have read the [process document](https://tc39.github.io/process-document/)
-  1. You have reviewed the [existing proposals](https://github.com/tc39/proposals/)
-  1. You are aware that your proposal requires being a member of TC39, or locating a TC39 delegate to "champion" your proposal
+# Current Implementations
+I see no good ways of doing this in the current ECMAScript standard as they either don't account for the "else" clause or don't accomplish the task in a clean way. If I'm missing any ways that this can be done without the proposed nullish ternary please let me know.
 
-## Create your proposal repo
+It could be done using an AND statement with the condition referenced twice but this could be done better.
+``` markdown
+(condition !== null && condition !== undefined) ? expression_if_not_nullish : expression_if_nullish
+```
 
-Follow these steps:
-  1. Click the green ["use this template"](https://github.com/tc39/template-for-proposals/generate) button in the repo header. (Note: Do not fork this repo in GitHub's web interface, as that will later prevent transfer into the TC39 organization)
-  1. Update the biblio to the latest version: `npm install --save-dev --save-exact @tc39/ecma262-biblio@latest`.
-  1. Go to your repo settings “Options” page, under “GitHub Pages”, and set the source to the **main branch** under the root (and click Save, if it does not autosave this setting)
-      1. check "Enforce HTTPS"
-      1. On "Options", under "Features", Ensure "Issues" is checked, and disable "Wiki", and "Projects" (unless you intend to use Projects)
-      1. Under "Merge button", check "automatically delete head branches"
-<!--
-  1. Avoid merge conflicts with build process output files by running:
-      ```sh
-      git config --local --add merge.output.driver true
-      git config --local --add merge.output.driver true
-      ```
-  1. Add a post-rewrite git hook to auto-rebuild the output on every commit:
-      ```sh
-      cp hooks/post-rewrite .git/hooks/post-rewrite
-      chmod +x .git/hooks/post-rewrite
-      ```
--->
-  3. ["How to write a good explainer"][explainer] explains how to make a good first impression.
+A nullish coalescing operator could be used but wouldn't be able to evaluate the expression_if_not_nullish.
+``` markdown
+(condition ?? expression_if_nullish)
+```
 
-      > Each TC39 proposal should have a `README.md` file which explains the purpose
-      > of the proposal and its shape at a high level.
-      >
-      > ...
-      >
-      > The rest of this page can be used as a template ...
+Or it could be done with a hash but this is very awkward and would assume the condition doesn't evaulate to the long_hash_value.
+``` markdown
+((condition ?? long_hash_value) !== long_hash_value) ? expression_if_not_nullish : expression_if_nullish
+```
 
-      Your explainer can point readers to the `index.html` generated from `spec.emu`
-      via markdown like
+# Obstacles 
+The reason this might not be possible is because ?? is already being used as the nullish coalescing operator while the ? did not have a previous coalescing meaning. This will prove difficult especially when trying to implement ternary chaining. Hopefully, these problems will not prove too difficult and a clean way of resolving conditionals for nullishness can be accomplished.
 
-      ```markdown
-      You can browse the [ecmarkup output](https://ACCOUNT.github.io/PROJECT/)
-      or browse the [source](https://github.com/ACCOUNT/PROJECT/blob/HEAD/spec.emu).
-      ```
-
-      where *ACCOUNT* and *PROJECT* are the first two path elements in your project's Github URL.
-      For example, for github.com/**tc39**/**template-for-proposals**, *ACCOUNT* is "tc39"
-      and *PROJECT* is "template-for-proposals".
-
-
-## Maintain your proposal repo
-
-  1. Make your changes to `spec.emu` (ecmarkup uses HTML syntax, but is not HTML, so I strongly suggest not naming it ".html")
-  1. Any commit that makes meaningful changes to the spec, should run `npm run build` and commit the resulting output.
-  1. Whenever you update `ecmarkup`, run `npm run build` and commit any changes that come from that dependency.
-
-  [explainer]: https://github.com/tc39/how-we-work/blob/HEAD/explainer.md
